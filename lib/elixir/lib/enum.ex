@@ -3248,6 +3248,29 @@ defimpl Enumerable, for: List do
   def slice([_ | tail], start, count), do: slice(tail, start - 1, count)
 end
 
+defimpl Enumerable, for: Tuple do
+  def count(tuple) do
+    tuple_size(tuple)
+  end
+
+  def member?([], _), do {:ok, false}
+  def member?({}, _), do {:ok, false}
+  def member?(tuple, elem) do
+    tuple
+    |> Tuple.to_list
+    |> member?(elem)
+  end
+
+  def slice({}, _start, _count), do: {}
+  def slice(tuple, start, count), do
+    tuple
+    |> Tuple.to_list
+    |> slice(start, count)
+  end
+
+  def reduce(_, {:halt, acc}, _fun), do: {:error, __MODULE__}
+end
+
 defimpl Enumerable, for: Map do
   def count(map) do
     {:ok, map_size(map)}
